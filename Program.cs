@@ -218,47 +218,13 @@ namespace TerminalImageViewer
             {
                 for (int x = 0; x < termWidth; x++)
                 {
-                    // Calculate the range of image pixels covered by this terminal cell
-                    int imgStartX = (int)(x / finalScale) + startX;
-                    int imgStartY = (int)(y / finalScale) + startY;
-                    int imgEndX = (int)((x + 1) / finalScale) + startX;
-                    int imgEndY = (int)((y + 1) / finalScale) + startY;
+                    int imgX = (int)(x / finalScale) + startX;
+                    int imgY = (int)(y / finalScale) + startY;
 
-                    // Constrain to image boundaries
-                    imgStartX = Math.Max(0, imgStartX);
-                    imgStartY = Math.Max(0, imgStartY);
-                    imgEndX = Math.Min(imgWidth - 1, imgEndX);
-                    imgEndY = Math.Min(imgHeight - 1, imgEndY);
-
-                    bool hasBlackPixel = false;
-                    Pixel pixelToShow = new Pixel(255, 255, 255);  // Default white
-
-                    if (imgStartX < imgWidth && imgStartY < imgHeight && imgEndX >= 0 && imgEndY >= 0)
+                    if (imgX >= 0 && imgX < imgWidth && imgY >= 0 && imgY < imgHeight)
                     {
-                        // First check for black pixels
-                        for (int sy = imgStartY; sy <= imgEndY && !hasBlackPixel; sy++)
-                        {
-                            for (int sx = imgStartX; sx <= imgEndX && !hasBlackPixel; sx++)
-                            {
-                                if (sx >= 0 && sx < imgWidth && sy >= 0 && sy < imgHeight)
-                                {
-                                    Pixel pixel = image[sy, sx];
-                                    // Check if pixel is black or very dark (threshold can be adjusted)
-                                    if (pixel.R < 20 && pixel.G < 20 && pixel.B < 20)
-                                    {
-                                        pixelToShow = pixel;
-                                        hasBlackPixel = true;
-                                    }
-                                    else if (!hasBlackPixel)
-                                    {
-                                        // Use this pixel if we don't find a black one
-                                        pixelToShow = pixel;
-                                    }
-                                }
-                            }
-                        }
-
-                        buffer.Append($"\x1b[48;2;{pixelToShow.R};{pixelToShow.G};{pixelToShow.B}m \x1b[0m");
+                        Pixel pixel = image[imgY, imgX];
+                        buffer.Append($"\x1b[48;2;{pixel.R};{pixel.G};{pixel.B}m \x1b[0m");
                     }
                     else
                     {
